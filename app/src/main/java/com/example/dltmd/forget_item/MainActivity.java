@@ -1,21 +1,28 @@
 package com.example.dltmd.forget_item;
 
+import android.app.DatePickerDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     static final String[] LIST_MENU = {"LIST1", "LIST2", "LIST3"};
+    private String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,65 +48,58 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // weather button에 대한 이벤트 처리.
-        Button addButton = (Button)findViewById(R.id.weather) ;
-        addButton.setOnClickListener(new Button.OnClickListener() {
+        Button weatherButton = (Button)findViewById(R.id.weather) ;
+        weatherButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                int count;
-                count = adapter.getCount();
 
-                // 아이템 추가.
-                items.add("LIST" + Integer.toString(count + 1));
-
-                // listview 갱신
-                adapter.notifyDataSetChanged();
             }
         }) ;
 
         // location button에 대한 이벤트 처리.
-        Button modifyButton = (Button)findViewById(R.id.location) ;
-        modifyButton.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                int count, checked ;
-                count = adapter.getCount() ;
+        Button locationButton = (Button)findViewById(R.id.location) ;
+        locationButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v){
 
-                if (count > 0) {
-                    // 현재 선택된 아이템의 position 획득.
-                    checked = listview.getCheckedItemPosition();
-                    if (checked > -1 && checked < count) {
-                        // 아이템 수정
-                        items.set(checked, Integer.toString(checked+1) + "번 아이템 수정") ;
-
-                        // listview 갱신
-                        adapter.notifyDataSetChanged();
-                    }
-                }
             }
         }) ;
 
         // date button 에 대한 이벤트 처리.
-        Button deleteButton = (Button)findViewById(R.id.date) ;
-        deleteButton.setOnClickListener(new Button.OnClickListener() {
+        Button dateButton = (Button)findViewById(R.id.date);
+        dateButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                int count, checked ;
-                count = adapter.getCount() ;
-
-                if (count > 0) {
-                    // 현재 선택된 아이템의 position 획득.
-                    checked = listview.getCheckedItemPosition();
-
-                    if (checked > -1 && checked < count) {
-                        // 아이템 삭제
-                        items.remove(checked) ;
-
-                        // listview 선택 초기화.
-                        listview.clearChoices();
-
-                        // listview 갱신.
-                        adapter.notifyDataSetChanged();
-                    }
-                }
+               init();
             }
         }) ;
+    }
+
+    private void init(){
+        final Calendar cal = Calendar.getInstance();
+
+        Log.e(TAG, cal.get(Calendar.YEAR)+"");
+        Log.e(TAG, cal.get(Calendar.MONTH)+1+"");
+        Log.e(TAG, cal.get(Calendar.DATE)+"");
+        Log.e(TAG, cal.get(Calendar.HOUR_OF_DAY)+"");
+        Log.e(TAG, cal.get(Calendar.MINUTE)+"");
+
+        //DATE PICKER DIALOG
+        findViewById(R.id.date).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DatePickerDialog dialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int date) {
+
+                        String msg = String.format("%d 년 %d 월 %d 일", year, month+1, date);
+                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+
+                dialog.getDatePicker().setMaxDate(new Date().getTime());    //입력한 날짜 이후로 클릭 안되게 옵션
+                dialog.show();
+
+            }
+        });
 
     }
 }
